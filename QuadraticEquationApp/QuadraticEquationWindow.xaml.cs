@@ -104,10 +104,10 @@ namespace QuadraticEquationApp
                 IsCorrectC = true;
             }
             #endregion
-
-            #region Решение дискриминантом
             if (IsCorrectA && IsCorrectB && IsCorrectC)
             {
+                #region Решение дискриминантом
+
                 var a = (int_a != 0 && double_a == 0) ? int_a : double_a;
                 var b = (int_b != 0 && double_b == 0) ? int_b : double_b;
                 var c = (int_c != 0 && double_c == 0) ? int_c : double_c;
