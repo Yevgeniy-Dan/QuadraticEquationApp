@@ -20,6 +20,9 @@ namespace QuadraticEquationApp
     /// </summary>
     public partial class QuadraticEquationWindow : Window
     {
+        //константа укзавает, до скольки округлять значение в  ответе
+        private const int rounding = 3;
+
         public QuadraticEquationWindow()
         {
             InitializeComponent();
@@ -46,116 +49,229 @@ namespace QuadraticEquationApp
 
             #region Проверка на правильность ввода
             //переменные для методов TryParse
-            int intValue = 0;
-            double doubleValue = 0;
+            double value = 0;
 
-            int int_a, int_b, int_c;
-            int_a = int_b = int_c = 0;
-
-            double double_a, double_b, double_c;
-            double_a = double_b = double_c = 0;
+            double a, b, c;
+            a = b = c = 0;
 
             //значение a
-            if (!int.TryParse(txta.Text, out intValue)
-                && !double.TryParse(txta.Text, out doubleValue))
+            if (!double.TryParse(txta.Text, out value))
             {
                 txta.BorderBrush = Brushes.Red;
                 statusTexta.Text = errorEnter;
             }
-            else if (txta.Text == "0")
-            {
-                txta.BorderBrush = Brushes.Red;
-                statusTexta.Text = "Коэффициент при первом слагаемом не может быть равным нулю";
-            }
             else
             {
-                int_a = intValue;
-                double_a = doubleValue;
+                a = value;
                 IsCorrectA = true;
-
             }
 
             //значение b
 
-            if (!int.TryParse(txtb.Text, out intValue)
-                && !double.TryParse(txtb.Text, out doubleValue))
+            if (!double.TryParse(txtb.Text, out value))
             {
                 txtb.BorderBrush = Brushes.Red;
                 statusTextb.Text = errorEnter;
             }
             else
             {
-                int_b = intValue;
-                double_b = doubleValue;
+                b = value;
                 IsCorrectB = true;
             }
             //значение c
 
-            if (!int.TryParse(txtc.Text, out intValue)
-                && !double.TryParse(txtc.Text, out doubleValue))
+            if (!double.TryParse(txtc.Text, out value))
             {
                 txtc.BorderBrush = Brushes.Red;
                 statusTextc.Text = errorEnter;
             }
             else
             {
-                int_c = intValue;
-                double_c = doubleValue;
+                c = value;
                 IsCorrectC = true;
             }
             #endregion
             if (IsCorrectA && IsCorrectB && IsCorrectC)
             {
-                #region Решение дискриминантом
+                #region Поиск решения
 
-                var a = (int_a != 0 && double_a == 0) ? int_a : double_a;
-                var b = (int_b != 0 && double_b == 0) ? int_b : double_b;
-                var c = (int_c != 0 && double_c == 0) ? int_c : double_c;
-
-                var discriminant = Math.Pow(b, 2) - 4 * a * c;
-
-                var x1 = (-b - Math.Sqrt(discriminant)) / (2 * a);
-                var x2 = (-b + Math.Sqrt(discriminant)) / (2 * a);
-                #endregion
-
-                #region Вывод результатов на экран
-                StringBuilder @string = new StringBuilder();
-
-                if (double.IsNaN(x1))
+                if (a != 0 && b != 0 && c != 0)
                 {
-                    @string.AppendLine($"Первый корень уравнения не является числом");
-                    if (double.IsNaN(x2))
-                    {
-                        @string.AppendLine($"Второй корень уравнения не является числом");
+                    Discrimimant(a, b, c);
+                }
+                else if (a != 0 && b != 0 && c == 0)
+                {
+                    //линейное уравнение
+                    double firstRoot = 0;
+                    double secondRoot = -b / a;
+                    LinearOutputResults("two", firstRoot, secondRoot);
+                }
+                else if (a == 0 && b != 0 && c != 0)
+                {
+                    //линейное уравнение
+                    double root = -c / b;
+                    LinearOutputResults("one", root);
+                }
+                else if (a == 0 && b == 0 && c == 0)
+                {
+                    string msg = $@"Уравнение не задано!
+Коэффициент при всех трех слагаемых не может равняться 0";
 
+                    MessageBox.Show(msg, "Результат", MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+                }
+                else if (a != 0 && b == 0 && c != 0)
+                {
+                    //линейное уравнение
+                    if (c < 0)
+                    {
+                        double firstRoot = Math.Sqrt(-c / a);
+                        double secondRoot = -firstRoot;
+                        LinearOutputResults("two", firstRoot, secondRoot);
+                    }
+                    else if (c > 0)
+                    {
+                        double firstRootRealPart = c / a;
+                        double secondRootRealPart = -firstRootRealPart;
+                        string imaginaryPart = "i";
+                        ComplexOutputResults(firstRootRealPart, secondRootRealPart, imaginaryPart);
                     }
                 }
-                else if (double.IsPositiveInfinity(x1))
+                else if ((a == 0 && b != 0 && c == 0) 
+                    || (a != 0 && b == 0 && c == 0))
                 {
-                    @string.AppendLine($"Первый корень уравнения равен плюс бесконечности");
-                    if (double.IsNegativeInfinity(x1))
-                    {
-                        @string.AppendLine($"Первый корень уравнения равен минус бесконечности");
-                    }
+                    MessageBox.Show("Уравнение имеет один корень: 0", "Результат",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+                    
                 }
-                else if (double.IsPositiveInfinity(x2))
+                else if(a == 0 && b == 0 && c != 0)
                 {
-                    @string.AppendLine($"Второй корень уравнения равен плюс бесконечности");
-                    if (double.IsPositiveInfinity(x2))
-                    {
-                        @string.AppendLine($"Второй корень уравнения равен плюс бесконечности");
-                    }
-                }
-                else
-                {
-                    @string.AppendLine($"Первый корень уравнения: {x1}");
-                    @string.AppendLine($"Второй корень уравнения: {x2}");
+                    MessageBox.Show("Уравнение не имеет смысла!", "Результат",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
                 }
 
-                MessageBox.Show(@string.ToString(), "Результат",
-                    MessageBoxButton.OK, MessageBoxImage.Information);
                 #endregion
             }
+        }
+
+        private static void Discrimimant(double a, double b, double c)
+        {
+
+
+            double discriminant = Math.Pow(b, 2) - 4 * a * c;
+
+            switch (discriminant)
+            {
+                case double d when d < 0:
+                    d *= -1;
+                    string firstComplexRoot = $"{-b} - {Math.Sqrt(d)}i / {2 * a}";
+                    string secondComplexRoot = $"{-b} + {Math.Sqrt(d)}i / {2 * a}";
+                    StringBuilder stringBuilder = new StringBuilder();
+                    stringBuilder.AppendLine($"Уравнение имеет два комплексных корня: \n");
+                    stringBuilder.AppendLine($"Первый корень: {firstComplexRoot}");
+                    stringBuilder.AppendLine($"Второй корень: {secondComplexRoot}");
+
+                    MessageBox.Show(stringBuilder.ToString(), "Результат",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+                    break;
+
+                case double d when d == 0:
+                    double root = -b / (2 * a);
+                    DiscriminantOutputResults("equals zero", root);
+                    break;
+
+                case double d when d > 0:
+                    double firstRoot = (-b - Math.Sqrt(discriminant)) / (2 * a);
+                    double secondRoot = (-b + Math.Sqrt(discriminant)) / (2 * a);
+                    DiscriminantOutputResults("Above zero", firstRoot, secondRoot);
+                    break;
+
+                default:
+                    MessageBox.Show("Что-то пошло не так...", "Результат",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+                    break;
+            }    
+        }
+
+
+        private static void LinearOutputResults
+            (string rootsNumber, double root, double secondRoot = 0)
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.AppendLine("");
+            switch (rootsNumber) 
+            {
+
+                case string s when s.Equals("one", StringComparison.OrdinalIgnoreCase):
+                    stringBuilder.AppendLine($"Линейное уравнение с единственным корнем: " +
+                        $"{Math.Round(root, rounding)}");
+
+                    MessageBox.Show(stringBuilder.ToString(), "Результат",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+                    break;
+
+                case string s when s.Equals("two", StringComparison.OrdinalIgnoreCase):
+                    stringBuilder.AppendLine($"Линейное уравнение с двумя корнями: \n");
+                    stringBuilder.AppendLine($"Первый корень уравнения: " +
+                        $"{Math.Round(root, rounding)}");
+                    stringBuilder.AppendLine($"Второй корень уравнения: " +
+                        $"{Math.Round(secondRoot, rounding)}");
+
+                    MessageBox.Show(stringBuilder.ToString(), "Результат",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+                    break;
+            }
+
+        }
+
+
+        private static void DiscriminantOutputResults(string discriminantValue,
+            double root, double secondRoot = 0)
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+
+            switch (discriminantValue)
+            {
+                //если дискриминант больше 0
+                case string s when s.Equals("above zero", StringComparison.OrdinalIgnoreCase):
+                    stringBuilder.AppendLine("Уравнение имеет два корня: \n");
+                    stringBuilder.AppendLine($"Первый корень: " +
+                        $"{Math.Round(root, rounding)}");
+                    stringBuilder.AppendLine($"Второй корень: " +
+                        $"{Math.Round(secondRoot, rounding)}");
+
+                    MessageBox.Show(stringBuilder.ToString(), "Результат",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+                    break;
+
+                //если дискриминант равен 0
+                case string s when s.Equals("equals zero", StringComparison.OrdinalIgnoreCase):
+                    stringBuilder.AppendLine($"Квадратное уравнение имеет " +
+                        $"один действительный корень:{Math.Round(root, rounding)}");
+                    MessageBox.Show(stringBuilder.ToString(), "Результат",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+                    break;
+                default:
+                    MessageBox.Show("Ошибка в коде...", "Результат",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+                    break;
+            }
+            
+        }
+
+
+        private static void ComplexOutputResults
+            (double firstRootRealPart, double secondRootRealPart, string imaginaryPart = "i")
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.AppendLine($"Уравнение имеет два комплексных корня \n");
+            stringBuilder.AppendLine($"Первый корень: " +
+                $"{Math.Round(firstRootRealPart, rounding)}{imaginaryPart}");
+            stringBuilder.AppendLine($"Второй корень: " +
+                $"{Math.Round(secondRootRealPart, rounding)}{imaginaryPart}");
+
+            MessageBox.Show(stringBuilder.ToString(), "Результат",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
 }

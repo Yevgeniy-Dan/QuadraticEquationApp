@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:QuadraticEquationApp"
         mc:Ignorable="d"
-        Title="Квадратное уравнение" Height="500" Width="600">
+        Title="Квадратное уравнение" Height="500" Width="600" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen">
     <Canvas>
         <TextBlock Width="592" Height="30" Background="YellowGreen" />
         <Label Content="Вычисление квадратного уравнения" HorizontalAlignment="Center"
