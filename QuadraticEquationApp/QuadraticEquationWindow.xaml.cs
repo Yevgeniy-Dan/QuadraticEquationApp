@@ -164,8 +164,8 @@ namespace QuadraticEquationApp
             {
                 case double d when d < 0:
                     d *= -1;
-                    string firstComplexRoot = $"{-b} - {Math.Sqrt(d)}i / {2 * a}";
-                    string secondComplexRoot = $"{-b} + {Math.Sqrt(d)}i / {2 * a}";
+                    string firstComplexRoot = $"{-b} - {Math.Round(Math.Sqrt(d),rounding)}i / {2 * a}";
+                    string secondComplexRoot = $"{-b} + {Math.Round(Math.Sqrt(d))}i / {2 * a}";
                     StringBuilder stringBuilder = new StringBuilder();
                     stringBuilder.AppendLine($"Уравнение имеет два комплексных корня: \n");
                     stringBuilder.AppendLine($"Первый корень: {firstComplexRoot}");
